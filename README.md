@@ -20,6 +20,23 @@ webcam / RTSP / video file
                                        overlay → window
 ```
 
+## Desktop app (no command prompt)
+
+After the one-time install below, **double-click `FlockCam.pyw`** in the project folder,
+or run `flockcam gui`. Tip: right-click `FlockCam.pyw` → *Send to → Desktop (create shortcut)*.
+
+- The live camera view shows a green box for known people and a red box for unknown faces.
+- **Add a person:** type a name, click **Capture photos** (or press Enter), and look at the
+  camera. Five photos are taken automatically, about 0.7 s apart. It only captures when exactly
+  one face is in view. Nothing is saved until all five are taken, and Esc cancels.
+- **People:** lists everyone enrolled. Clicking ✕ twice removes a person *and* deletes their
+  photos.
+- **Recent activity:** a live feed of sightings, also written to `data/events.jsonl`.
+- On the first launch the face models are downloaded automatically.
+
+Face photos go to `data/faces/<name>/`, snapshots of unknown faces to `data/snapshots/`, and
+errors to `data/flockcam.log`.
+
 ## Quick start (Windows, PowerShell)
 
 ```powershell
@@ -73,7 +90,14 @@ src/flockcam/
   camera.py     capture (DirectShow on Windows) and the live loop
   models.py     model download
   cli.py        argparse entry point
-tests/          43 unit/integration tests + real-model smoke tests
+  enrollment.py guided capture session: N samples, one face only, atomic commit
+  gui/
+    view.py        pure renderer: ViewModel -> window image + clickable regions
+    controller.py  GUI state and input handling (typing, clicks, enroll/remove)
+    app.py         OpenCV window, background camera thread, model loading
+    theme.py       colours and fonts
+FlockCam.pyw    double-click launcher (uses the project's .venv)
+tests/          73 unit/integration tests + real-model smoke tests
 ```
 
 ## Design decisions
@@ -92,6 +116,11 @@ tests/          43 unit/integration tests + real-model smoke tests
   recognition hold up better across pose and lighting.
 - **Stable IDs for unknown faces plus a cooldown.** Without them, one stranger in front of the
   camera would produce a new alert and snapshot on every frame.
+- **GUI drawn as pure image rendering.** The window is one image drawn with Pillow from a
+  `ViewModel` and shown in an OpenCV window, so no Tk/Qt install is needed. Rendering is
+  stateless, and the controller takes plain key and click events. The tests "type" names and
+  "click" buttons without opening a window, and the camera runs on its own thread so the UI
+  never blocks.
 - **Operational details.** Database writes are atomic (temp file then rename). Faces below a
   minimum size are ignored. `--every N` trades latency for CPU. `--no-window` runs headless for
   a server or RTSP deployment.

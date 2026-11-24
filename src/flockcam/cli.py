@@ -39,6 +39,9 @@ def build_parser() -> argparse.ArgumentParser:
     run.add_argument("--cooldown", type=float, default=10.0, help="seconds between repeat alerts")
     run.add_argument("--every", type=int, default=1, help="process every Nth frame")
     run.add_argument("--no-window", action="store_true", help="headless mode (log only)")
+
+    g = sub.add_parser("gui", help="open the desktop app (live view + point-and-click enrollment)")
+    g.add_argument("--source", default="0")
     return p
 
 
@@ -154,4 +157,9 @@ def main(argv: Optional[List[str]] = None) -> int:
         return 0 if n else 1
     if args.command == "run":
         return cmd_run(args, cfg)
+    if args.command == "gui":
+        from .gui.app import main as gui_main
+
+        return gui_main(["--source", args.source, "--data-dir", str(cfg.data_dir),
+                         "--models-dir", str(cfg.models_dir), "--threshold", str(cfg.match_threshold)])
     return 2
