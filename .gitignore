@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+.venv/
+venv/
+build/
+dist/
+
+# Model weights are downloaded, not committed
+models/
+
+# Biometric data and captures must never be committed
+data/
