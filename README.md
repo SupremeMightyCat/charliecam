@@ -156,7 +156,7 @@ accuracy figure.
 ## Testing
 
 ```powershell
-pytest               # 112 tests, about 2 s
+pytest               # 114 tests, about 2 s
 ruff check src tests # lint
 ```
 

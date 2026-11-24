@@ -27,7 +27,7 @@ from ..database import FaceDatabase
 from ..enrollment import EnrollmentSession, delete_face_photos, face_folder, validate_name
 from ..events import EventRecorder
 from ..overlay import draw_faces
-from ..pipeline import RecognitionPipeline
+from ..pipeline import RecognitionPipeline, fit_photo
 
 log = logging.getLogger("charliecam.web")
 
@@ -221,6 +221,7 @@ class WebService:
         image = cv2.imdecode(np.frombuffer(data, dtype=np.uint8), cv2.IMREAD_COLOR)
         if image is None:
             raise ValueError("That file isn't an image CharlieCam can read")
+        image = fit_photo(image)  # phone photos are too large to detect faces in
         with self.lock:
             if self.pipeline is None:
                 raise ValueError("Face models are still loading")

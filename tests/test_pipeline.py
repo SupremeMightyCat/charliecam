@@ -119,3 +119,22 @@ def test_iou():
     assert iou(a, a) == 1.0
     assert iou(a, BoundingBox(20, 20, 10, 10)) == 0.0
     assert iou(a, BoundingBox(5, 0, 10, 10)) == pytest.approx(50 / 150)
+
+
+def test_fit_photo_only_shrinks():
+    import numpy as np
+
+    from charliecam.pipeline import fit_photo
+
+    big = np.zeros((4000, 3000, 3), np.uint8)
+    assert fit_photo(big).shape == (1280, 960, 3)
+    small = np.zeros((480, 640, 3), np.uint8)
+    assert fit_photo(small) is small
+
+
+def test_enroll_from_large_phone_photo(pipeline):
+    import cv2
+
+    photo = cv2.resize(make_frame((20, 20, GREEN)), (3200, 2400), interpolation=cv2.INTER_NEAREST)
+    pipeline.enroll_from_image("bob", photo)
+    assert pipeline.process(make_frame((100, 100, GREEN)))[0].track_label == "bob"

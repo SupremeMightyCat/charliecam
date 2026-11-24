@@ -5,11 +5,26 @@ import time
 from dataclasses import dataclass
 from typing import Callable, List, Optional
 
+import cv2
 import numpy as np
 
 from .database import FaceDatabase, _normalize
 from .engines import FaceDetector, FaceEmbedder
 from .types import BoundingBox, MatchResult, RecognizedFace
+
+# Phone photos are 3000-4000 px tall. YuNet is trained on faces at camera-like
+# sizes and misses a face that fills a frame that large, so photos are scaled
+# down to this longest side before detection.
+MAX_PHOTO_SIDE = 1280
+
+
+def fit_photo(image: np.ndarray, max_side: int = MAX_PHOTO_SIDE) -> np.ndarray:
+    """Scale ``image`` down so its longest side is at most ``max_side`` (never up)."""
+    h, w = image.shape[:2]
+    scale = max_side / max(h, w)
+    if scale >= 1:
+        return image
+    return cv2.resize(image, (round(w * scale), round(h * scale)), interpolation=cv2.INTER_AREA)
 
 
 @dataclass
@@ -132,6 +147,7 @@ class RecognitionPipeline:
 
     def enroll_from_image(self, name: str, image: np.ndarray) -> np.ndarray:
         """Add the single largest face in ``image`` to the database."""
+        image = fit_photo(image)
         dets = self.detector.detect(image)
         if not dets:
             raise ValueError("No face found in image")
