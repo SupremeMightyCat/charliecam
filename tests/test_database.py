@@ -1,8 +1,8 @@
 import numpy as np
 import pytest
 
-from flockcam.database import FaceDatabase
-from flockcam.types import UNKNOWN
+from charliecam.database import FaceDatabase
+from charliecam.types import UNKNOWN
 
 
 def vec(*xs):

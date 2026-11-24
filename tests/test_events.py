@@ -3,8 +3,8 @@ from pathlib import Path
 
 import pytest
 
+from charliecam.events import EventRecorder
 from conftest import BLUE, RED, make_frame
-from flockcam.events import EventRecorder
 
 
 class FakeClock:
@@ -26,7 +26,7 @@ def recorder(tmp_path, clock):
 
 
 def read_log(recorder):
-    return [json.loads(l) for l in recorder.log_path.read_text().splitlines()]
+    return [json.loads(line) for line in recorder.log_path.read_text().splitlines()]
 
 
 def test_unknown_face_logged_with_snapshot(pipeline, recorder):

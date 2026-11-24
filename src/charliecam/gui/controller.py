@@ -79,7 +79,8 @@ class GuiController:
             else:
                 for ev in self.recorder.record(frame, faces):
                     stamp = datetime.fromisoformat(ev["timestamp"]).astimezone()
-                    self.activity.appendleft(ActivityItem(stamp.strftime("%H:%M:%S"), ev["label"], ev["known"]))
+                    item = ActivityItem(stamp.strftime("%H:%M:%S"), ev["label"], ev["known"])
+                    self.activity.appendleft(item)
             if self._last_frame_t is not None:
                 dt = max(now - self._last_frame_t, 1e-6)
                 self.fps = 1 / dt if self.fps == 0 else 0.9 * self.fps + 0.1 / dt

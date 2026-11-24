@@ -10,9 +10,9 @@ from typing import List
 import numpy as np
 import pytest
 
-from flockcam.database import FaceDatabase
-from flockcam.pipeline import RecognitionPipeline
-from flockcam.types import BoundingBox, Detection
+from charliecam.database import FaceDatabase
+from charliecam.pipeline import RecognitionPipeline
+from charliecam.types import BoundingBox, Detection
 
 # BGR colours that are orthogonal to each other => cosine similarity 0.
 RED = (0, 0, 255)

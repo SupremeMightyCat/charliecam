@@ -1,8 +1,7 @@
 import pytest
 
+from charliecam.enrollment import EnrollmentSession, delete_face_photos, face_folder, validate_name
 from conftest import BLUE, GREEN, make_frame
-from flockcam.enrollment import (EnrollmentSession, delete_face_photos, face_folder,
-                                 validate_name)
 
 
 class Clock:

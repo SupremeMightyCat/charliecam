@@ -1,9 +1,11 @@
 import numpy as np
 
+from charliecam.config import Config, parse_source
+from charliecam.overlay import GREEN as BOX_GREEN
+from charliecam.overlay import RED as BOX_RED
+from charliecam.overlay import draw_faces
+from charliecam.types import BoundingBox
 from conftest import BLUE, RED, make_frame
-from flockcam.config import Config, parse_source
-from flockcam.overlay import GREEN as BOX_GREEN, RED as BOX_RED, draw_faces
-from flockcam.types import BoundingBox
 
 
 def test_known_face_gets_green_box_unknown_red(pipeline):

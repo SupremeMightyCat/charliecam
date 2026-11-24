@@ -13,13 +13,10 @@ DEFAULT_MATCH_THRESHOLD = 0.363
 class Config:
     data_dir: Path = Path("data")
     models_dir: Path = Path("models")
-    source: Union[int, str] = 0  # webcam index or RTSP/file path
     match_threshold: float = DEFAULT_MATCH_THRESHOLD
     detection_confidence: float = 0.8
     min_face_size: int = 40  # pixels; smaller faces are too blurry to trust
     event_cooldown_s: float = 10.0  # don't re-alert the same identity sooner
-    process_every_n_frames: int = 1
-    show_window: bool = True
 
     @property
     def database_path(self) -> Path:

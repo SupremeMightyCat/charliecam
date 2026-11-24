@@ -45,6 +45,7 @@ class Detection:
 class MatchResult:
     name: str  # person's name, or UNKNOWN
     similarity: float  # best cosine similarity found in the database (-1..1)
+    held: bool = False  # name carried over from a recent match by IdentityTracker
 
     @property
     def is_known(self) -> bool:

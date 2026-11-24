@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>CharlieCam flier</title>
+<style>
+  @page { size: Letter; margin: 0; }
+  :root {
+    --ink: #111827; --muted: #4b5563; --faint: #9ca3af; --line: #e5e7eb; --soft: #f3f4f6;
+    --accent: #2563eb; --accent-soft: #eff6ff; --green: #16a34a; --red: #dc2626; --navy: #0d0f14;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 8.5in; height: 11in; }
+  body {
+    font-family: "Segoe UI Variable Text", "Segoe UI", Arial, sans-serif; color: var(--ink);
+    font-size: 8.9pt; line-height: 1.34; background: #fff;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  .page { width: 8.5in; height: 11in; display: flex; flex-direction: column; overflow: hidden; }
+
+  /* header */
+  header { background: var(--navy); color: #fff; padding: 0.32in 0.5in 0.24in; position: relative; }
+  .brand { display: flex; align-items: center; gap: 14px; }
+  .logo { width: 46px; height: 46px; border-radius: 12px; background: #3b82f6; display: grid; place-items: center; }
+  .logo span { width: 24px; height: 24px; border-radius: 50%; border: 4.5px solid #fff; display: grid; place-items: center; }
+  .logo span::after { content: ""; width: 6px; height: 6px; border-radius: 50%; background: #fff; }
+  h1 { font-size: 30pt; line-height: 1; font-weight: 700; letter-spacing: -0.02em; }
+  .tagline { font-size: 13pt; color: #c7d2fe; margin-top: 4px; font-weight: 500; }
+  .lede { margin-top: 11px; color: #d1d5db; font-size: 9.8pt; max-width: 6.9in; line-height: 1.45; }
+  .lede b { color: #fff; font-weight: 600; }
+  .badge { position: absolute; top: 0.38in; right: 0.5in; font-size: 8pt; color: #9ca3af; text-align: right; line-height: 1.5; }
+  .badge b { color: #e5e7eb; font-weight: 600; display: block; font-size: 8.6pt; }
+
+  main { padding: 0.2in 0.5in 0; flex: 1; display: flex; flex-direction: column; gap: 0.15in; }
+  h2 { font-size: 8.4pt; text-transform: uppercase; letter-spacing: 0.09em; color: var(--accent); font-weight: 700; margin-bottom: 7px; }
+
+  /* hero row */
+  .hero { display: grid; grid-template-columns: 3.9in 1fr; gap: 0.22in; align-items: start; }
+  .shot { border-radius: 9px; overflow: hidden; border: 1px solid #1f2937; box-shadow: 0 6px 18px rgba(17,24,39,.18); }
+  .shot img { display: block; width: 100%; }
+  .caption { font-size: 7.6pt; color: var(--faint); margin-top: 5px; }
+  ul.does { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+  ul.does li { display: grid; grid-template-columns: 16px 1fr; gap: 7px; }
+  ul.does li::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--accent); margin-top: 4px; }
+  ul.does b { font-weight: 600; }
+
+  /* stats */
+  .stats { display: grid; grid-template-columns: repeat(5, 1fr); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+  .stat { padding: 9px 10px 8px; border-right: 1px solid var(--line); }
+  .stat:last-child { border-right: 0; }
+  .num { font-size: 17pt; font-weight: 700; letter-spacing: -0.02em; line-height: 1.05; color: var(--ink); }
+  .num small { font-size: 9pt; font-weight: 600; color: var(--muted); }
+  .lbl { font-size: 7.7pt; color: var(--muted); line-height: 1.3; margin-top: 2px; }
+
+  /* pipeline */
+  .pipe { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0; }
+  .step { position: relative; padding: 8px 9px 8px 10px; background: var(--soft); border-top: 3px solid var(--accent); margin-right: 12px; border-radius: 0 0 6px 6px; }
+  .step:last-child { margin-right: 0; border-top-color: var(--green); }
+  .step:not(:last-child)::after {
+    content: ""; position: absolute; right: -11px; top: 50%; transform: translateY(-50%);
+    border-left: 8px solid #cbd5e1; border-top: 7px solid transparent; border-bottom: 7px solid transparent;
+  }
+  .step .n { font-size: 7.2pt; font-weight: 700; color: var(--accent); letter-spacing: .05em; }
+  .step:last-child .n { color: var(--green); }
+  .step .t { font-weight: 650; font-size: 9.3pt; margin: 1px 0 2px; }
+  .step .d { font-size: 7.5pt; color: var(--muted); line-height: 1.32; }
+
+  /* two columns */
+  .cols { display: grid; grid-template-columns: 1.18fr 1fr; gap: 0.24in; }
+  .clever { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+  .clever li { padding-left: 11px; border-left: 2px solid var(--line); }
+  .clever b { font-weight: 650; }
+  .clever span { color: var(--muted); }
+  table { width: 100%; border-collapse: collapse; font-size: 8.2pt; }
+  td { padding: 3px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tr:last-child td { border-bottom: 0; }
+  td.lib { font-weight: 650; white-space: nowrap; padding-right: 10px; width: 1%; }
+  td.lic { color: var(--faint); font-size: 7.4pt; white-space: nowrap; text-align: right; padding-left: 8px; }
+  td.use { color: var(--muted); }
+  .note { margin-top: 10px; padding: 8px 10px; background: var(--accent-soft); border-radius: 8px; font-size: 8.2pt; color: #1e3a8a; }
+  .note b { font-weight: 650; }
+
+  footer { margin-top: auto; padding: 0.12in 0.5in 0.26in; display: flex; justify-content: space-between; align-items: center; gap: 16px; border-top: 1px solid var(--line); }
+  code { font-family: "Cascadia Mono", Consolas, monospace; font-size: 8.4pt; background: var(--soft); padding: 3px 7px; border-radius: 5px; color: var(--ink); }
+  .foot-right { font-size: 7.8pt; color: var(--faint); text-align: right; }
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <div class="brand">
+      <div class="logo"><span></span></div>
+      <div>
+        <h1>CharlieCam</h1>
+        <div class="tagline">A camera that takes attendance.</div>
+      </div>
+    </div>
+    <p class="lede">
+      CrabBots meets every week, and someone has to track who showed up. CharlieCam recognises members
+      <b>standing still or walking past</b> the camera and keeps a <b>per-meeting attendance record</b>.
+      Upload <b>one clear photo</b> of a new member and they are recognised seconds later, with no
+      retraining, GPU or cloud service.
+    </p>
+    <div class="badge"><b>CrabBots Software Lead Challenge</b>Python · OpenCV · FastAPI</div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div>
+        <div class="shot"><img src="screenshot.png" alt="CharlieCam web app"></div>
+        <div class="caption">The browser app: live view, add-a-person, today's attendance and the people list.</div>
+      </div>
+      <div>
+        <h2>What it does</h2>
+        <ul class="does">
+          <li><div><b>Live recognition.</b> A green box and name for members, and a red "Unknown #N" for anyone else, at about 30 fps on a laptop CPU.</div></li>
+          <li><div><b>Instant enrollment.</b> Upload photos, or click Capture and it takes 5 good shots automatically, only when exactly one face is in view.</div></li>
+          <li><div><b>Attendance.</b> Who is here, when they arrived and who is still missing, for any past meeting, with a CSV export.</div></li>
+                    <li><div><b>Runs anywhere.</b> Webcam, RTSP camera or recorded video, through a browser app, a desktop app or a CLI. Unknown faces are saved for review.</div></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="stats">
+      <div class="stat"><div class="num">1 <small>photo</small></div><div class="lbl">is enough to enroll a member; no retraining</div></div>
+      <div class="stat"><div class="num">~30 <small>fps</small></div><div class="lbl">detect + recognise on a CPU, 640×480</div></div>
+      <div class="stat"><div class="num">78→99.5<small>%</small></div><div class="lbl">walking-past frames named, tracker off → on*</div></div>
+      <div class="stat"><div class="num">112</div><div class="lbl">automated tests; CI on Windows + Linux</div></div>
+      <div class="stat"><div class="num">0</div><div class="lbl">cloud calls; faces never leave the PC</div></div>
+    </section>
+
+    <section>
+      <h2>The pipeline: from walking past to the attendance record</h2>
+      <div class="pipe">
+        <div class="step"><div class="n">1 · CAPTURE</div><div class="t">Camera thread</div><div class="d">Always keeps the newest frame, so a slow step never builds lag.</div></div>
+        <div class="step"><div class="n">2 · DETECT</div><div class="t">YuNet CNN</div><div class="d">Finds faces plus 5 landmarks. Faces under 40 px are skipped.</div></div>
+        <div class="step"><div class="n">3 · EMBED</div><div class="t">SFace</div><div class="d">Aligns on the landmarks, then turns the face into a 128-d vector.</div></div>
+        <div class="step"><div class="n">4 · MATCH</div><div class="t">Cosine similarity</div><div class="d">One NumPy matrix product against every stored vector, with a threshold of 0.363.</div></div>
+        <div class="step"><div class="n">5 · TRACK</div><div class="t">Identity tracker</div><div class="d">Keeps the name through blurry frames as the person moves.</div></div>
+        <div class="step"><div class="n">6 · RECORD</div><div class="t">Event log → attendance</div><div class="d">One entry per person per 10 s. Attendance is computed from the log.</div></div>
+      </div>
+    </section>
+
+    <section class="cols">
+      <div>
+        <h2>Clever approaches</h2>
+        <ul class="clever">
+          <li><b>Open-set matching, not a classifier.</b> <span>It can say "none of the above", and a new member is one more vector. That is why the live upload demo works immediately.</span></li>
+          <li><b>A motion-aware hold.</b> <span>A face too blurred to match keeps the name of a person matched under 1 s ago in the same spot (by box overlap). The hold never extends itself, so a stranger can't inherit a name.</span></li>
+                    <li><b>One source of truth.</b> <span>An append-only JSON-lines log. Attendance for any day is computed from it, so the two can never disagree.</span></li>
+          <li><b>Testable without a camera.</b> <span>The detector and embedder sit behind interfaces. In tests a "face" is a coloured square whose colour is its embedding, so every layer is deterministic.</span></li>
+          <li><b>Safe by default.</b> <span>Localhost only, cross-site requests blocked, atomic writes, stable IDs plus a cooldown so one visitor makes one alert, and biometric data git-ignored.</span></li>
+        </ul>
+      </div>
+      <div>
+        <h2>Built on open source</h2>
+        <table>
+          <tr><td class="lib">OpenCV</td><td class="use">DNN runtime, capture, drawing</td><td class="lic">Apache-2.0</td></tr>
+          <tr><td class="lib">YuNet</td><td class="use">Face detector + landmarks (OpenCV Zoo)</td><td class="lic">MIT</td></tr>
+          <tr><td class="lib">SFace</td><td class="use">Face embeddings (OpenCV Zoo)</td><td class="lic">Apache-2.0</td></tr>
+          <tr><td class="lib">NumPy</td><td class="use">Vectorised cosine matching</td><td class="lic">BSD-3</td></tr>
+          <tr><td class="lib">FastAPI</td><td class="use">JSON API + MJPEG video stream</td><td class="lic">MIT</td></tr>
+          <tr><td class="lib">Uvicorn</td><td class="use">Local web server</td><td class="lic">BSD-3</td></tr>
+          <tr><td class="lib">Pillow</td><td class="use">Desktop app rendering</td><td class="lic">MIT-CMU</td></tr>
+          <tr><td class="lib">pytest · Ruff</td><td class="use">Tests + lint in GitHub Actions</td><td class="lic">MIT</td></tr>
+        </table>
+        <div class="note"><b>Trade-offs:</b> no liveness check (a printed photo can match), and side profiles aren't recognised. Mount the camera at the door at face height, facing people as they walk in.</div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div><code>pip install -e . &nbsp;&amp;&amp;&nbsp; charliecam web</code></div>
+    <div class="foot-right">*Synthetic benchmark: one enrolled photo, heavy motion blur (tools/walk_benchmark.py).<br>Code MIT · models from OpenCV Zoo</div>
+  </footer>
+</div>
+</body>
+</html>

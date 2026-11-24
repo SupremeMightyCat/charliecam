@@ -25,7 +25,7 @@ class FaceEmbedder(Protocol):
 def _require(path: Path) -> str:
     if not Path(path).exists():
         raise FileNotFoundError(
-            f"Model not found: {path}. Run `python -m flockcam download-models` first."
+            f"Model not found: {path}. Run `python -m charliecam download-models` first."
         )
     return str(path)
 

@@ -12,9 +12,9 @@ import cv2
 import numpy as np
 from PIL import Image, ImageDraw
 
-from . import theme as T
 from ..enrollment import EnrollProgress
 from ..types import RecognizedFace
+from . import theme as T
 
 Rect = Tuple[int, int, int, int]  # x0, y0, x1, y1
 
@@ -169,7 +169,7 @@ class Renderer:
     def _header(self, d, vm: ViewModel, x: int, y: int) -> int:
         d.rounded_rectangle((x, y + 2, x + 36, y + 38), 10, fill=T.ACCENT)
         d.ellipse((x + 10, y + 12, x + 26, y + 28), outline=(255, 255, 255), width=3)
-        d.text((x + 50, y + 20), "FlockCam", font=T.font(24, bold=True), fill=T.TEXT, anchor="lm")
+        d.text((x + 50, y + 20), "CharlieCam", font=T.font(24, bold=True), fill=T.TEXT, anchor="lm")
         return y + 40
 
     def _button(self, d, key: str, rect: Rect, text: str, enabled: bool, hover: bool,
@@ -238,7 +238,8 @@ class Renderer:
         for name in shown:
             cy = ry + row_h // 2
             d.ellipse((x + pad, cy - 15, x + pad + 30, cy + 15), fill=T.avatar_colour(name))
-            d.text((x + pad + 15, cy), name[0].upper(), font=T.font(14, bold=True), fill=(255, 255, 255), anchor="mm")
+            d.text((x + pad + 15, cy), name[0].upper(), font=T.font(14, bold=True),
+                   fill=(255, 255, 255), anchor="mm")
             confirming = vm.confirm_remove == name
             key = f"remove:{name}"
             btn_w = 78 if confirming else 30
@@ -247,11 +248,13 @@ class Renderer:
             d.text((x + pad + 44, cy - 8), _ellipsize(d, name, T.font(15, bold=True), name_w),
                    font=T.font(15, bold=True), fill=T.TEXT, anchor="lm")
             n = vm.people[name]
-            d.text((x + pad + 44, cy + 10), f"{n} photo{'s' if n != 1 else ''}", font=T.font(12), fill=T.MUTED, anchor="lm")
+            d.text((x + pad + 44, cy + 10), f"{n} photo{'s' if n != 1 else ''}", font=T.font(12),
+                   fill=T.MUTED, anchor="lm")
             hovered = vm.hover == key
             if confirming:
                 d.rounded_rectangle(btn, 8, fill=T.UNKNOWN)
-                d.text(((btn[0] + btn[2]) // 2, cy), "Remove?", font=T.font(13, bold=True), fill=(255, 255, 255), anchor="mm")
+                d.text(((btn[0] + btn[2]) // 2, cy), "Remove?", font=T.font(13, bold=True),
+                       fill=(255, 255, 255), anchor="mm")
             else:
                 if hovered:
                     d.rounded_rectangle(btn, 8, fill=(60, 30, 34))
@@ -280,6 +283,7 @@ class Renderer:
                 break
             cy = ry + 8
             d.ellipse((x + pad, cy - 4, x + pad + 8, cy + 4), fill=T.KNOWN if item.known else T.UNKNOWN)
-            d.text((x + pad + 18, cy), _ellipsize(d, item.label, T.font(13), 190), font=T.font(13), fill=T.TEXT, anchor="lm")
+            label = _ellipsize(d, item.label, T.font(13), 190)
+            d.text((x + pad + 18, cy), label, font=T.font(13), fill=T.TEXT, anchor="lm")
             d.text((x1 - pad, cy), item.time, font=T.font(12), fill=T.MUTED, anchor="rm")
             ry += row_h

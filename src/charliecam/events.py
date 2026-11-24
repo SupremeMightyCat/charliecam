@@ -60,6 +60,7 @@ class EventRecorder:
                 "label": face.track_label,
                 "known": face.match.is_known,
                 "similarity": round(face.match.similarity, 4),
+                "held": face.match.held,
                 "confidence": round(face.detection.confidence, 4),
                 "box": list(face.detection.box.__dict__.values()),
                 "snapshot": str(snapshot) if snapshot else None,

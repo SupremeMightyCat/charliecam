@@ -4,12 +4,12 @@ import json
 import cv2
 import pytest
 
+from charliecam import cli
+from charliecam.camera import run_live
+from charliecam.database import FaceDatabase
+from charliecam.events import EventRecorder
+from charliecam.pipeline import RecognitionPipeline
 from conftest import BLUE, GREEN, FakeDetector, FakeEmbedder, make_frame
-from flockcam import cli
-from flockcam.camera import run_live
-from flockcam.database import FaceDatabase
-from flockcam.events import EventRecorder
-from flockcam.pipeline import RecognitionPipeline
 
 
 @pytest.fixture
@@ -85,7 +85,7 @@ def test_live_loop_on_video_file(tmp_path):
     processed = run_live(pipeline, rec, str(video), show_window=False)
 
     assert processed == 10
-    events = [json.loads(l) for l in rec.log_path.read_text().splitlines()]
+    events = [json.loads(line) for line in rec.log_path.read_text().splitlines()]
     assert [e["label"] for e in events] == ["bob", "Unknown #1"]
     assert len(list(rec.snapshot_dir.glob("*.jpg"))) == 1
 

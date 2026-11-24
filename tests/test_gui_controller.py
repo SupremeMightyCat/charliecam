@@ -1,11 +1,11 @@
 """Drives the GUI exactly as a user would (typing, clicking) with no real window."""
 import pytest
 
+from charliecam.database import FaceDatabase
+from charliecam.events import EventRecorder
+from charliecam.gui.controller import GuiController
+from charliecam.gui.theme import HEIGHT, WIDTH
 from conftest import BLUE, GREEN, make_frame
-from flockcam.database import FaceDatabase
-from flockcam.events import EventRecorder
-from flockcam.gui.controller import GuiController
-from flockcam.gui.theme import HEIGHT, WIDTH
 
 
 class Clock:

@@ -1,7 +1,8 @@
-"""Command-line interface: `python -m flockcam <command>`."""
+"""Command-line interface: `python -m charliecam <command>`."""
 from __future__ import annotations
 
 import argparse
+from datetime import date, datetime
 from pathlib import Path
 from typing import List, Optional
 
@@ -14,7 +15,7 @@ IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".bmp", ".webp"}
 
 
 def build_parser() -> argparse.ArgumentParser:
-    p = argparse.ArgumentParser(prog="flockcam", description="Live facial recognition camera")
+    p = argparse.ArgumentParser(prog="charliecam", description="Live facial recognition camera")
     p.add_argument("--data-dir", type=Path, default=Path("data"))
     p.add_argument("--models-dir", type=Path, default=Path("models"))
     p.add_argument("--threshold", type=float, default=DEFAULT_MATCH_THRESHOLD,
@@ -34,6 +35,10 @@ def build_parser() -> argparse.ArgumentParser:
     r = sub.add_parser("remove", help="remove a person")
     r.add_argument("name")
 
+    a = sub.add_parser("attendance", help="who was seen on a day (default today)")
+    a.add_argument("--date", type=date.fromisoformat, help="YYYY-MM-DD")
+    a.add_argument("--csv", type=Path, help="also save the report as a CSV file")
+
     run = sub.add_parser("run", help="start live recognition")
     run.add_argument("--source", default="0", help="webcam index, RTSP URL or video file")
     run.add_argument("--cooldown", type=float, default=10.0, help="seconds between repeat alerts")
@@ -42,6 +47,13 @@ def build_parser() -> argparse.ArgumentParser:
 
     g = sub.add_parser("gui", help="open the desktop app (live view + point-and-click enrollment)")
     g.add_argument("--source", default="0")
+
+    w = sub.add_parser("web", help="open CharlieCam in your browser (local web app)")
+    w.add_argument("--source", default="0", help="webcam index, RTSP URL or video file")
+    w.add_argument("--host", default="127.0.0.1",
+                   help="use 0.0.0.0 to allow other devices on your network (default: this PC only)")
+    w.add_argument("--port", type=int, default=8000)
+    w.add_argument("--no-browser", action="store_true", help="don't open a browser tab")
     return p
 
 
@@ -61,11 +73,9 @@ def _expand_images(paths: List[Path]) -> List[Path]:
 
 
 def _build_pipeline(cfg: Config, db: FaceDatabase):
-    from .engines import SFaceEmbedder, YuNetDetector
-    from .pipeline import RecognitionPipeline
+    from .models import build_pipeline
 
-    detector = YuNetDetector(cfg.detector_model, cfg.detection_confidence, cfg.min_face_size)
-    return RecognitionPipeline(detector, SFaceEmbedder(cfg.recognizer_model), db)
+    return build_pipeline(cfg, db)
 
 
 def cmd_enroll(args, cfg: Config, pipeline=None) -> int:
@@ -132,6 +142,23 @@ def cmd_run(args, cfg: Config) -> int:
     return 0
 
 
+def cmd_attendance(args, cfg: Config) -> int:
+    from .attendance import report, to_csv
+
+    enrolled = FaceDatabase.load(cfg.database_path, cfg.match_threshold).people()
+    rep = report(cfg.events_path, enrolled, args.date)
+    print(f"Attendance for {rep['date']}: {len(rep['present'])} present, {len(rep['absent'])} absent")
+    for a in rep["present"]:
+        first = datetime.fromisoformat(a["first_seen"]).strftime("%H:%M")
+        print(f"  present  {a['name']}  (first seen {first}, {a['sightings']} sighting(s))")
+    for name in rep["absent"]:
+        print(f"  absent   {name}")
+    if args.csv:
+        args.csv.write_text(to_csv(rep), encoding="utf-8", newline="")
+        print(f"Saved {args.csv}")
+    return 0
+
+
 def main(argv: Optional[List[str]] = None) -> int:
     args = build_parser().parse_args(argv)
     cfg = _config(args)
@@ -153,8 +180,14 @@ def main(argv: Optional[List[str]] = None) -> int:
         db = FaceDatabase.load(cfg.database_path, cfg.match_threshold)
         n = db.remove(args.name)
         db.save(cfg.database_path)
+        if n:
+            from .enrollment import delete_face_photos
+
+            delete_face_photos(cfg.data_dir / "faces", args.name)
         print(f"Removed {n} sample(s) for '{args.name}'.")
         return 0 if n else 1
+    if args.command == "attendance":
+        return cmd_attendance(args, cfg)
     if args.command == "run":
         return cmd_run(args, cfg)
     if args.command == "gui":
@@ -162,4 +195,11 @@ def main(argv: Optional[List[str]] = None) -> int:
 
         return gui_main(["--source", args.source, "--data-dir", str(cfg.data_dir),
                          "--models-dir", str(cfg.models_dir), "--threshold", str(cfg.match_threshold)])
+    if args.command == "web":
+        from .web.app import main as web_main
+
+        web_args = ["--source", args.source, "--host", args.host, "--port", str(args.port),
+                    "--data-dir", str(cfg.data_dir), "--models-dir", str(cfg.models_dir),
+                    "--threshold", str(cfg.match_threshold)]
+        return web_main(web_args + (["--no-browser"] if args.no_browser else []))
     return 2

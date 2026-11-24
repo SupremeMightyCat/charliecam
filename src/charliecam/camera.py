@@ -1,17 +1,21 @@
 """Video capture plus the live recognition loop."""
 from __future__ import annotations
 
+import logging
 import sys
+import threading
 import time
 from typing import Optional, Union
 
 import cv2
+import numpy as np
 
 from .events import EventRecorder
 from .overlay import draw_faces, draw_status
 from .pipeline import RecognitionPipeline
 
-WINDOW = "FlockCam - q: quit | e: enroll largest face"
+WINDOW = "CharlieCam - q: quit | e: enroll largest face"
+log = logging.getLogger("charliecam.camera")
 
 
 def open_capture(source: Union[int, str]) -> cv2.VideoCapture:
@@ -81,3 +85,46 @@ def run_live(
         if show_window:
             cv2.destroyAllWindows()
     return frames
+
+
+class CameraThread(threading.Thread):
+    """Reads frames continuously so the UI never blocks on the camera."""
+
+    def __init__(self, source: Union[int, str]) -> None:
+        super().__init__(daemon=True)
+        self.source = source
+        self._lock = threading.Lock()
+        self._frame: Optional[np.ndarray] = None
+        self._stop = threading.Event()
+        self.error: Optional[str] = None
+
+    def run(self) -> None:
+        try:
+            cap = open_capture(self.source)
+        except RuntimeError as exc:
+            self.error = "Camera not available. Is another app using it?"
+            log.error("%s", exc)
+            return
+        # Video files would otherwise be read as fast as the disk allows;
+        # play them back at their real frame rate instead.
+        is_file = isinstance(self.source, str) and "://" not in self.source
+        delay = 1.0 / (cap.get(cv2.CAP_PROP_FPS) or 30) if is_file else 0.0
+        try:
+            while not self._stop.is_set():
+                ok, frame = cap.read()
+                if not ok:
+                    self.error = "Video ended" if is_file else "Camera disconnected"
+                    break
+                if delay:
+                    time.sleep(delay)
+                with self._lock:
+                    self._frame = frame
+        finally:
+            cap.release()
+
+    def latest(self) -> Optional[np.ndarray]:
+        with self._lock:
+            return None if self._frame is None else self._frame.copy()
+
+    def stop(self) -> None:
+        self._stop.set()
